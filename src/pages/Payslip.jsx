@@ -53,24 +53,25 @@ export default function Payslip() {
 
   useEffect(() => {
     if (downloadingInvoice && downloadPdfRef.current) {
-      const element = downloadPdfRef.current;
-      const opt = {
-        margin:       0,
-        filename:     `${downloadingInvoice.invoiceNo}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      
-      element.style.display = 'block';
-      html2pdf().set(opt).from(element).save().then(() => {
-        element.style.display = 'none';
-        setDownloadingInvoice(null);
-      }).catch(err => {
-        console.error('PDF error', err);
-        element.style.display = 'none';
-        setDownloadingInvoice(null);
-      });
+      const timer = setTimeout(() => {
+        const element = downloadPdfRef.current;
+        const opt = {
+          margin:       0,
+          filename:     `${downloadingInvoice.invoiceNo}.pdf`,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true, logging: false },
+          jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+          setDownloadingInvoice(null);
+        }).catch(err => {
+          console.error('PDF error', err);
+          setDownloadingInvoice(null);
+        });
+      }, 150);
+
+      return () => clearTimeout(timer);
     }
   }, [downloadingInvoice]);
 
@@ -190,11 +191,9 @@ export default function Payslip() {
                     {inv.invoiceDate}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${(!inv.status || inv.status === 'Paid') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10' :
-                        'bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 shadow-sm shadow-green-500/10'
-                      }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${(!inv.status || inv.status === 'Paid') ? 'bg-emerald-500' : 'bg-green-500'}`}></span>
-                      {inv.status === 'Pending' ? 'Completed' : (inv.status || 'Paid')}
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10">
+                      <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-emerald-500"></span>
+                      Completed
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -269,8 +268,8 @@ export default function Payslip() {
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-lg text-slate-700 dark:text-slate-200">₹{inv.grandTotal.toFixed(2)}</div>
-                  <span className={`inline-flex items-center px-2 py-0.5 mt-1 rounded-full text-[10px] font-bold border ${(!inv.status || inv.status === 'Paid') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'}`}>
-                    {inv.status === 'Pending' ? 'Completed' : (inv.status || 'Paid')}
+                  <span className="inline-flex items-center px-2 py-0.5 mt-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                    Completed
                   </span>
                 </div>
               </div>
@@ -354,7 +353,7 @@ export default function Payslip() {
       )}
 
       {/* Hidden PDF Download Template */}
-      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '750px' }}>
+      <div style={{ position: 'fixed', left: '-9999px', top: 0, width: '750px', backgroundColor: '#fff' }}>
         {downloadingInvoice && (
           <InvoiceTemplate 
             ref={downloadPdfRef} 

@@ -69,10 +69,11 @@ export default function CreateInvoice({ onBack, initialData }) {
       // 1. Save to DB
       const invoiceData = {
         ...formData,
+        amount: parsedAmount,
         cgst,
         sgst,
         grandTotal,
-        status: initialData ? initialData.status : 'Paid',
+        status: initialData ? initialData.status : 'Completed',
         particulars: 'Vehicle Rental Service',
       };
       
@@ -92,10 +93,7 @@ export default function CreateInvoice({ onBack, initialData }) {
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
-      // Temporarily make it visible for html2pdf to process properly if needed
-      element.style.display = 'block';
       await html2pdf().set(opt).from(element).save();
-      element.style.display = 'none';
 
       alert(`Invoice ${initialData ? 'updated' : 'created'} and PDF downloaded successfully!`);
       onBack(true);
@@ -223,7 +221,7 @@ export default function CreateInvoice({ onBack, initialData }) {
       </div>
 
       {/* Hidden PDF Template */}
-      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '750px' }}>
+      <div style={{ position: 'fixed', left: '-9999px', top: 0, width: '750px', backgroundColor: '#fff' }}>
         <InvoiceTemplate 
           ref={pdfRef} 
           invoice={formData} 
