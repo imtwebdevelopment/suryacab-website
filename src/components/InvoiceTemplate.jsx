@@ -26,6 +26,12 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
   const cgst = calculatedValues?.cgst ?? invoice.cgst ?? 0;
   const sgst = calculatedValues?.sgst ?? invoice.sgst ?? 0;
   const grandTotal = calculatedValues?.grandTotal ?? invoice.grandTotal ?? 0;
+  const isGstApplied = invoice.applyGst !== 'no';
+
+  // Fallbacks for older invoices that didn't have these fields saved in DB
+  const bankName = invoice.bankName || 'KOTAK MAHINDRA BANK';
+  const accountNo = invoice.accountNo || '8751183874';
+  const ifscCode = invoice.ifscCode || 'KKBK0008045';
 
   return (
     <div ref={ref} style={{ padding: '30px', fontFamily: '"Times New Roman", Times, serif', color: '#000', backgroundColor: '#fff', width: '800px', margin: '0 auto' }}>
@@ -86,9 +92,17 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
                   <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>GSTIN :</div>
                   <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>29AFYFS0562E1ZH</div>
                 </div>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
                   <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Nature of Services:</div>
                   <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>Vehicle Rental Services</div>
+                </div>
+                <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
+                  <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Service Account Code (SAC No)</div>
+                  <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>{invoice.sacNo || '996601'}</div>
+                </div>
+                <div style={{ display: 'flex' }}>
+                  <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>REVERSE CHARGE APPLICABLE (Yes/No)</div>
+                  <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>{invoice.reverseCharge || 'no'}</div>
                 </div>
             </div>
           </div>
@@ -160,17 +174,17 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
             <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>A/c No</div>
             <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>IFSC Code</div>
             <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>Total</div>
-            <div style={{ width: '20%', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>{amount}</div>
+            <div style={{ width: '20%', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>{amount.toFixed(2)}</div>
           </div>
           
           {/* Bank Details Table Row 2 */}
           <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-            <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{invoice.bankName}</div>
-            <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{invoice.accountNo}</div>
-            <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{invoice.ifscCode}</div>
+            <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{bankName}</div>
+            <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{accountNo}</div>
+            <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{ifscCode}</div>
             <div style={{ width: '7.5%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>CGST</div>
-            <div style={{ width: '7.5%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>2.5%</div>
-            <div style={{ width: '20%', padding: '6px', textAlign: 'center' }}>{cgst}</div>
+            <div style={{ width: '7.5%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{isGstApplied ? '2.5%' : '0%'}</div>
+            <div style={{ width: '20%', padding: '6px', textAlign: 'center' }}>{cgst.toFixed(2)}</div>
           </div>
           
           {/* Bank Details Table Row 3 (Amount in words + SGST + Grand Total) */}
@@ -181,7 +195,7 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
             <div style={{ width: '15%', borderRight: '1px solid #000', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', borderBottom: '1px solid #000', flex: 1 }}>
                   <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>SGST</div>
-                  <div style={{ width: '50%', padding: '6px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2.5%</div>
+                  <div style={{ width: '50%', padding: '6px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{isGstApplied ? '2.5%' : '0%'}</div>
                 </div>
                 <div style={{ padding: '6px', textAlign: 'center', fontWeight: 'bold', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   Grand Total
@@ -189,10 +203,10 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
             </div>
             <div style={{ width: '20%', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ borderBottom: '1px solid #000', padding: '6px', textAlign: 'center', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {sgst}
+                  {sgst.toFixed(2)}
                 </div>
                 <div style={{ padding: '6px', textAlign: 'center', fontWeight: 'bold', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {grandTotal}
+                  {grandTotal.toFixed(2)}
                 </div>
             </div>
           </div>

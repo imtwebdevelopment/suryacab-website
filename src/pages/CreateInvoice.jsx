@@ -39,6 +39,9 @@ export default function CreateInvoice({ onBack, initialData }) {
     bankName: initialData?.bankName || 'KOTAK MAHINDRA BANK',
     accountNo: initialData?.accountNo || '8751183874',
     ifscCode: initialData?.ifscCode || 'KKBK0008045',
+    sacNo: initialData?.sacNo || '996601',
+    reverseCharge: initialData?.reverseCharge || 'no',
+    applyGst: initialData?.applyGst || 'yes',
   });
 
   const [loading, setLoading] = useState(false);
@@ -53,8 +56,9 @@ export default function CreateInvoice({ onBack, initialData }) {
   };
 
   const parsedAmount = parseFloat(formData.amount) || 0;
-  const cgst = parsedAmount * 0.025;
-  const sgst = parsedAmount * 0.025;
+  const isGstApplied = formData.applyGst === 'yes';
+  const cgst = isGstApplied ? parsedAmount * 0.025 : 0;
+  const sgst = isGstApplied ? parsedAmount * 0.025 : 0;
   const grandTotal = parsedAmount + cgst + sgst;
 
   const handleSubmit = async (e) => {
@@ -131,6 +135,10 @@ export default function CreateInvoice({ onBack, initialData }) {
               <input type="text" name="customerName" value={formData.customerName} onChange={handleInputChange} placeholder="e.g. VTT MOBILITY PRIVATE LIMITED" className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" required />
             </div>
             <div>
+              <label className="block text-sm font-medium mb-1 dark:text-slate-300">Reverse Charge Applicable</label>
+              <input type="text" name="reverseCharge" value={formData.reverseCharge} onChange={handleInputChange} placeholder="e.g. no" className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
               <label className="block text-sm font-medium mb-1 dark:text-slate-300">Customer Address</label>
               <textarea name="customerAddress" value={formData.customerAddress} onChange={handleInputChange} placeholder="e.g. No.3 3rd Main Muneshwara Temple Street&#10;Venkatagowda Layout, Hebbal, Kempapura&#10;Bangalore - 560024" rows="3" className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
             </div>
@@ -158,6 +166,13 @@ export default function CreateInvoice({ onBack, initialData }) {
               <label className="block text-sm font-medium mb-1 dark:text-slate-300">Amount (₹)</label>
               <input type="number" name="amount" value={formData.amount} onChange={handleInputChange} placeholder="e.g. 4731250" className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" required />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 dark:text-slate-300">Apply GST</label>
+              <select name="applyGst" value={formData.applyGst} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="yes">Yes (Apply 5% GST)</option>
+                <option value="no">No (0% GST)</option>
+              </select>
+            </div>
             <div className="md:col-span-2 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
               <h3 className="font-medium text-slate-800 dark:text-slate-200 mb-4">Bank Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -183,14 +198,18 @@ export default function CreateInvoice({ onBack, initialData }) {
               <span>Amount:</span>
               <span>₹{parsedAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
-              <span>CGST (2.5%):</span>
-              <span>₹{cgst.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
-              <span>SGST (2.5%):</span>
-              <span>₹{sgst.toFixed(2)}</span>
-            </div>
+            {isGstApplied && (
+              <>
+                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
+                  <span>CGST (2.5%):</span>
+                  <span>₹{cgst.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
+                  <span>SGST (2.5%):</span>
+                  <span>₹{sgst.toFixed(2)}</span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between font-bold text-slate-800 dark:text-slate-200 mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
               <span>Grand Total:</span>
               <span>₹{grandTotal.toFixed(2)}</span>
@@ -204,7 +223,7 @@ export default function CreateInvoice({ onBack, initialData }) {
       </div>
 
       {/* Hidden PDF Template */}
-      <div style={{ display: 'none' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '800px' }}>
         <InvoiceTemplate 
           ref={pdfRef} 
           invoice={formData} 

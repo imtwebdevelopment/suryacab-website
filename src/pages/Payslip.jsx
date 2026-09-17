@@ -354,7 +354,7 @@ export default function Payslip() {
       )}
 
       {/* Hidden PDF Download Template */}
-      <div style={{ display: 'none' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '800px' }}>
         {downloadingInvoice && (
           <InvoiceTemplate 
             ref={downloadPdfRef} 
