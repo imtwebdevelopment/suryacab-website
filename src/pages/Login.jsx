@@ -75,12 +75,11 @@ export default function Login({ onLogin }) {
             </div>
           </div>
           
-          <div className="flex items-center justify-between text-xs mt-1">
+          <div className="flex items-center text-xs mt-1">
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input type="checkbox" className="w-3.5 h-3.5 rounded text-indigo-500 bg-slate-100 border-slate-300 focus:ring-indigo-500" />
               <span className="text-slate-600 dark:text-slate-400">Remember me</span>
             </label>
-            <a href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">Forgot Password?</a>
           </div>
 
           <button 
