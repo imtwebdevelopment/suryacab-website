@@ -34,29 +34,29 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
   const ifscCode = invoice.ifscCode || 'KKBK0008045';
 
   return (
-    <div ref={ref} style={{ padding: '30px', fontFamily: '"Times New Roman", Times, serif', color: '#000', backgroundColor: '#fff', width: '800px', margin: '0 auto' }}>
+    <div ref={ref} style={{ padding: '15px 20px', fontFamily: '"Times New Roman", Times, serif', color: '#000', backgroundColor: '#fff', width: '750px', margin: '0 auto', boxSizing: 'border-box' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end', height: '26px' }}>
-              <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
-              <div style={{ width: '0', height: '0', borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderBottom: '26px solid #0055b8' }}></div>
-              <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
+            <div style={{ display: 'flex', gap: '3px', alignItems: 'flex-end', height: '22px' }}>
+              <div style={{ width: '18px', height: '22px', backgroundColor: '#0055b8' }}></div>
+              <div style={{ width: '0', height: '0', borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderBottom: '22px solid #0055b8' }}></div>
+              <div style={{ width: '18px', height: '22px', backgroundColor: '#0055b8' }}></div>
             </div>
-            <div style={{ fontSize: '11px', color: '#00a4e4', fontWeight: 'bold', margin: '4px 0', letterSpacing: '1px' }}>SURYA CABS</div>
-            <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start', height: '26px' }}>
-              <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
-              <div style={{ width: '0', height: '0', borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderTop: '26px solid #0055b8' }}></div>
-              <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
+            <div style={{ fontSize: '10px', color: '#00a4e4', fontWeight: 'bold', margin: '2px 0', letterSpacing: '1px' }}>SURYA CABS</div>
+            <div style={{ display: 'flex', gap: '3px', alignItems: 'flex-start', height: '22px' }}>
+              <div style={{ width: '18px', height: '22px', backgroundColor: '#0055b8' }}></div>
+              <div style={{ width: '0', height: '0', borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '22px solid #0055b8' }}></div>
+              <div style={{ width: '18px', height: '22px', backgroundColor: '#0055b8' }}></div>
             </div>
         </div>
-        <div style={{ backgroundColor: '#0055b8', color: '#fff', padding: '10px 40px', letterSpacing: '4px', fontSize: '24px', marginTop: '20px', fontWeight: 'bold' }}>
+        <div style={{ backgroundColor: '#0055b8', color: '#fff', padding: '6px 25px', letterSpacing: '3px', fontSize: '20px', marginTop: '10px', fontWeight: 'bold', marginRight: '110px' }}>
           SURYA CABS AND LOGISTICS
         </div>
       </div>
 
-      <div style={{ textAlign: 'center', fontSize: '14px', marginBottom: '15px' }}>
+      <div style={{ textAlign: 'center', fontSize: '12px', marginBottom: '10px', lineHeight: '1.3' }}>
         # 420: 7th Block 1st C.Cross Koramangala. Bangalore 560095.<br/>
         Contact No - 9980275630 / 9481354131 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Website: www.suryacabsandlogistics.com<br/>
         GSTNO : 29AFYFS0562E1ZH
@@ -163,9 +163,9 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
           
           {/* Main Items Row */}
           <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-            <div style={{ width: '8%', borderRight: '1px solid #000', padding: '40px 6px', textAlign: 'center' }}>1</div>
-            <div style={{ width: '72%', borderRight: '1px solid #000', padding: '40px 6px', textAlign: 'center' }}>Vehicle Rental Service</div>
-            <div style={{ width: '20%', padding: '40px 6px', textAlign: 'center' }}>{amount}</div>
+            <div style={{ width: '8%', borderRight: '1px solid #000', padding: '15px 6px', textAlign: 'center' }}>1</div>
+            <div style={{ width: '72%', borderRight: '1px solid #000', padding: '15px 6px', textAlign: 'center' }}>Vehicle Rental Service</div>
+            <div style={{ width: '20%', padding: '15px 6px', textAlign: 'center' }}>{amount}</div>
           </div>
 
           {/* Bank Details Table Row 1 */}

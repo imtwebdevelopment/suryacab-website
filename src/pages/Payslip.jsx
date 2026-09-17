@@ -55,11 +55,11 @@ export default function Payslip() {
     if (downloadingInvoice && downloadPdfRef.current) {
       const element = downloadPdfRef.current;
       const opt = {
-        margin:       0.5,
+        margin:       0,
         filename:     `${downloadingInvoice.invoiceNo}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
       
       element.style.display = 'block';
@@ -344,7 +344,7 @@ export default function Payslip() {
               </div>
             </div>
             <div className="flex-1 overflow-auto p-4 sm:p-8 bg-slate-100 flex justify-center sm:justify-center justify-start">
-              <div className="shadow-2xl ring-1 ring-slate-900/5 rounded-sm flex-shrink-0 w-[800px] bg-white">
+              <div className="shadow-2xl ring-1 ring-slate-900/5 rounded-sm flex-shrink-0 w-[750px] bg-white">
                 <InvoiceTemplate invoice={previewInvoice} />
               </div>
             </div>
@@ -354,7 +354,7 @@ export default function Payslip() {
       )}
 
       {/* Hidden PDF Download Template */}
-      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '800px' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '750px' }}>
         {downloadingInvoice && (
           <InvoiceTemplate 
             ref={downloadPdfRef} 

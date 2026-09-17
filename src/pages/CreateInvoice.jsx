@@ -85,11 +85,11 @@ export default function CreateInvoice({ onBack, initialData }) {
       // 2. Generate PDF
       const element = pdfRef.current;
       const opt = {
-        margin:       0.5,
+        margin:       0,
         filename:     `${formData.invoiceNo}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
       // Temporarily make it visible for html2pdf to process properly if needed
@@ -223,7 +223,7 @@ export default function CreateInvoice({ onBack, initialData }) {
       </div>
 
       {/* Hidden PDF Template */}
-      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '800px' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1000, pointerEvents: 'none', width: '750px' }}>
         <InvoiceTemplate 
           ref={pdfRef} 
           invoice={formData} 
