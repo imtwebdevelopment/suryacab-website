@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api';
+import Logo from '../components/Logo';
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -33,11 +34,12 @@ export default function Login({ onLogin }) {
       </div>
       
       <div className="w-full max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg shadow-indigo-500/30 mb-4 ring-2 ring-white/20">
-            A
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Logo className="w-32 h-auto mb-2 drop-shadow-lg" />
+          <div className="mt-3 max-w-[280px] w-full mx-auto bg-[#0055b8] text-white text-[10px] sm:text-[11px] font-bold text-center py-1.5 tracking-[0.15em] rounded-sm shadow-md">
+            SURYA CABS AND LOGISTICS
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Welcome Back</h2>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight mt-6">Welcome Back</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Sign in to access your admin dashboard</p>
         </div>
 

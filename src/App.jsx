@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Payslip from './pages/Payslip';
 import Login from './pages/Login';
+import Settings from './pages/Settings';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -73,8 +74,9 @@ function App() {
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 z-0">
-          {activeTab === 'Dashboard' && <Dashboard />}
+          {activeTab === 'Dashboard' && <Dashboard setActiveTab={setActiveTab} />}
           {activeTab === 'Invoices' && <Payslip />}
+          {activeTab === 'Settings' && <Settings />}
         </div>
       </main>
     </div>

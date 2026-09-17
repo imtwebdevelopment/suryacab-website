@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { IndianRupee, FileText, CheckCircle2, BarChart3, Activity, ArrowRight, TrendingUp } from 'lucide-react';
 
-export default function Dashboard() {
+export default function Dashboard({ setActiveTab }) {
   const [stats, setStats] = useState({
     revenue: 0,
     totalInvoices: 0,
@@ -104,7 +104,10 @@ export default function Dashboard() {
              <BarChart3 className="w-6 h-6 text-indigo-500" />
              Revenue Analytics
            </h3>
-           <button className="text-sm font-medium text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1 group-hover:gap-2 transition-all">
+           <button 
+             onClick={() => setActiveTab('Invoices')}
+             className="text-sm font-medium text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1 group-hover:gap-2 transition-all"
+           >
              View Full Report <ArrowRight className="w-4 h-4" />
            </button>
          </div>

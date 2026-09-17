@@ -25,20 +25,20 @@ function numberToWords(num) {
 import InvoiceTemplate from '../components/InvoiceTemplate';
 
 export default function CreateInvoice({ onBack, initialData }) {
-  const [formData, setFormData] = useState(initialData || {
-    invoiceNo: `NM-${Math.floor(Math.random() * 1000)}`,
-    invoiceDate: new Date().toISOString().split('T')[0],
-    customerName: '',
-    customerAddress: '',
-    customerPan: '',
-    customerGstin: '',
-    deliveryCity: 'Bangalore',
-    servicePeriodFrom: '',
-    servicePeriodTo: '',
-    amount: '',
-    bankName: 'KOTAK MAHINDRA BANK',
-    accountNo: '8751183874',
-    ifscCode: 'KKBK0008045',
+  const [formData, setFormData] = useState({
+    invoiceNo: initialData?.invoiceNo || `NM-${Math.floor(Math.random() * 1000)}`,
+    invoiceDate: initialData?.invoiceDate || new Date().toISOString().split('T')[0],
+    customerName: initialData?.customerName || '',
+    customerAddress: initialData?.customerAddress || '',
+    customerPan: initialData?.customerPan || '',
+    customerGstin: initialData?.customerGstin || '',
+    deliveryCity: initialData?.deliveryCity || 'Bangalore',
+    servicePeriodFrom: initialData?.servicePeriodFrom || '',
+    servicePeriodTo: initialData?.servicePeriodTo || '',
+    amount: initialData?.amount || '',
+    bankName: initialData?.bankName || 'KOTAK MAHINDRA BANK',
+    accountNo: initialData?.accountNo || '8751183874',
+    ifscCode: initialData?.ifscCode || 'KKBK0008045',
   });
 
   const [loading, setLoading] = useState(false);

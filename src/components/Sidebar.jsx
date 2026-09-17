@@ -1,19 +1,21 @@
 import React from 'react';
-import { LayoutDashboard, FileSpreadsheet, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileSpreadsheet, LogOut, Settings as SettingsIcon } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Sidebar({ activeTab, setActiveTab, onLogout, isOpen, setIsOpen }) {
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard },
-    { name: 'Invoices', icon: FileSpreadsheet }
+    { name: 'Invoices', icon: FileSpreadsheet },
+    { name: 'Settings', icon: SettingsIcon }
   ];
 
   return (
     <aside className={`fixed md:relative inset-y-0 left-0 w-64 flex-shrink-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border-r border-slate-200 dark:border-slate-700 shadow-2xl z-40 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-      <div className="p-6 flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-500">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 flex items-center justify-center text-white font-bold text-xl ring-2 ring-white/20 hover:rotate-12 transition-transform cursor-pointer">
-          A
+      <div className="p-6 flex flex-col items-center justify-center animate-in fade-in slide-in-from-left-4 duration-500 border-b border-slate-100 dark:border-slate-700/50">
+        <Logo className="w-20 h-auto drop-shadow-md" />
+        <div className="mt-3 w-[90%] mx-auto bg-[#0055b8] text-white text-[8px] font-bold text-center py-1 tracking-[0.1em] rounded-sm shadow-sm">
+          SURYA CABS AND LOGISTICS
         </div>
-        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">AdminPanel</span>
       </div>
       
       <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
