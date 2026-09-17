@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import api from '../api';
 import Logo from '../components/Logo';
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -27,13 +29,14 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/4 w-[1000px] h-[1000px] rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="absolute -bottom-1/2 -left-1/4 w-[800px] h-[800px] rounded-full bg-purple-500/10 blur-3xl" />
+    <div className="min-h-screen relative flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+      {/* Split Background */}
+      <div className="absolute inset-0 flex flex-col z-0">
+        <div className="flex-[3] bg-[#f0eaff] dark:bg-slate-900"></div>
+        <div className="flex-[2] bg-white dark:bg-slate-950"></div>
       </div>
       
-      <div className="w-full max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 p-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="text-center mb-8 flex flex-col items-center">
           <Logo className="w-32 h-auto mb-2 drop-shadow-lg" />
           <div className="mt-3 max-w-[280px] w-full mx-auto bg-[#0055b8] text-white text-[10px] sm:text-[11px] font-bold text-center py-1.5 tracking-[0.15em] rounded-sm shadow-md">
@@ -51,21 +54,30 @@ export default function Login({ onLogin }) {
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-slate-800 dark:text-slate-200"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-slate-800 dark:text-slate-200"
               placeholder="admin@example.com"
               required
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-slate-800 dark:text-slate-200"
-              placeholder="••••••••"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 pr-12 rounded-xl bg-slate-50/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-slate-800 dark:text-slate-200"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
           
           <div className="flex items-center justify-between text-sm">
