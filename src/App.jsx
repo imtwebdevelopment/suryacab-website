@@ -67,7 +67,17 @@ function App() {
               </svg>
             </button>
             <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 p-0.5 shadow-md cursor-pointer hover:scale-105 transition-transform">
-              <img src="https://i.pravatar.cc/150?img=11" alt="Profile" className="w-full h-full rounded-full border-2 border-white dark:border-slate-900 object-cover" />
+              {(() => {
+                const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+                if (userObj.profileImage) {
+                  return <img src={userObj.profileImage} alt="Profile" className="w-full h-full rounded-full border-2 border-white dark:border-slate-900 object-cover bg-white" />;
+                }
+                return (
+                  <div className="w-full h-full rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-500 font-bold">
+                    {userObj.name ? userObj.name.charAt(0).toUpperCase() : 'A'}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </header>

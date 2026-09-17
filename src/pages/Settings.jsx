@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Mail, Lock, Shield, CheckCircle2, AlertCircle, Save } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Mail, Lock, Shield, CheckCircle2, AlertCircle, Save, Camera } from 'lucide-react';
 import api from '../api';
 
 export default function Settings() {
@@ -7,13 +7,15 @@ export default function Settings() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    profileImage: ''
   });
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchProfile();
@@ -27,7 +29,8 @@ export default function Settings() {
         name: res.data.name || '',
         email: res.data.email || '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        profileImage: res.data.profileImage || ''
       });
     } catch (err) {
       setError('Failed to load profile data.');
@@ -39,6 +42,21 @@ export default function Settings() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setError('Image must be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, profileImage: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -60,6 +78,10 @@ export default function Settings() {
       
       if (formData.password) {
         updateData.password = formData.password;
+      }
+      
+      if (formData.profileImage) {
+        updateData.profileImage = formData.profileImage;
       }
 
       const res = await api.put('/auth/profile', updateData);
@@ -106,6 +128,29 @@ export default function Settings() {
         
         <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
           
+          <div className="flex flex-col items-center mb-8 relative">
+            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                {formData.profileImage ? (
+                  <img src={formData.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-slate-400" />
+                )}
+              </div>
+              <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-3">Click to upload picture</p>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageChange} 
+              accept="image/*" 
+              className="hidden" 
+            />
+          </div>
+
           {message && (
             <div className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-500/20 flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
