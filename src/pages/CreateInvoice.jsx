@@ -35,13 +35,22 @@ export default function CreateInvoice({ onBack, initialData }) {
     deliveryCity: initialData?.deliveryCity || 'Bangalore',
     servicePeriodFrom: initialData?.servicePeriodFrom || '',
     servicePeriodTo: initialData?.servicePeriodTo || '',
-    amount: initialData?.amount || '',
     bankName: initialData?.bankName || 'KOTAK MAHINDRA BANK',
     accountNo: initialData?.accountNo || '8751183874',
     ifscCode: initialData?.ifscCode || 'KKBK0008045',
     sacNo: initialData?.sacNo || '996601',
     reverseCharge: initialData?.reverseCharge || 'no',
     applyGst: initialData?.applyGst || 'yes',
+  });
+
+  const [items, setItems] = useState(() => {
+    if (initialData?.items && initialData.items.length > 0) {
+      return initialData.items;
+    }
+    if (initialData?.amount !== undefined && initialData?.amount !== null && initialData?.amount !== '') {
+      return [{ particular: initialData.particulars || 'Vehicle Rental Service', amount: initialData.amount }];
+    }
+    return [{ particular: 'Vehicle Rental Service', amount: '' }];
   });
 
   const [loading, setLoading] = useState(false);
@@ -51,11 +60,31 @@ export default function CreateInvoice({ onBack, initialData }) {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'amount' ? (value === '' ? '' : parseFloat(value)) : value
+      [name]: value
     }));
   };
 
-  const parsedAmount = parseFloat(formData.amount) || 0;
+  const handleItemChange = (index, field, value) => {
+    setItems(prev => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        [field]: field === 'amount' ? value : value
+      };
+      return updated;
+    });
+  };
+
+  const handleAddItem = () => {
+    setItems(prev => [...prev, { particular: '', amount: '' }]);
+  };
+
+  const handleRemoveItem = (index) => {
+    if (items.length <= 1) return;
+    setItems(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const parsedAmount = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   const isGstApplied = formData.applyGst === 'yes';
   const cgst = isGstApplied ? parsedAmount * 0.025 : 0;
   const sgst = isGstApplied ? parsedAmount * 0.025 : 0;
@@ -69,12 +98,13 @@ export default function CreateInvoice({ onBack, initialData }) {
       // 1. Save to DB
       const invoiceData = {
         ...formData,
+        items,
         amount: parsedAmount,
         cgst,
         sgst,
         grandTotal,
         status: initialData ? initialData.status : 'Completed',
-        particulars: 'Vehicle Rental Service',
+        particulars: items.map(i => i.particular).filter(Boolean).join(', ') || 'Vehicle Rental Service',
       };
       
       if (initialData && initialData._id) {
@@ -161,16 +191,83 @@ export default function CreateInvoice({ onBack, initialData }) {
               <input type="date" name="servicePeriodTo" value={formData.servicePeriodTo} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" required />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1 dark:text-slate-300">Amount (₹)</label>
-              <input type="number" name="amount" value={formData.amount} onChange={handleInputChange} placeholder="e.g. 4731250" className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" required />
-            </div>
-            <div>
               <label className="block text-sm font-medium mb-1 dark:text-slate-300">Apply GST</label>
               <select name="applyGst" value={formData.applyGst} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="yes">Yes (Apply 5% GST)</option>
                 <option value="no">No (0% GST)</option>
               </select>
             </div>
+
+            {/* Dynamic Particulars Section */}
+            <div className="md:col-span-2 space-y-3">
+              <label className="block text-sm font-semibold text-slate-800 dark:text-slate-200">
+                Particulars
+              </label>
+              <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 text-sm font-medium border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="py-2.5 px-4 w-16 text-center">S.No</th>
+                      <th className="py-2.5 px-4">Particulars</th>
+                      <th className="py-2.5 px-4 w-48">Amount</th>
+                      <th className="py-2.5 px-2 w-10 text-center"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {items.map((item, index) => (
+                      <tr key={index} className="bg-white dark:bg-slate-800">
+                        <td className="py-2 px-4 text-center font-medium text-slate-600 dark:text-slate-400 text-sm">
+                          {index + 1}
+                        </td>
+                        <td className="py-2 px-4">
+                          <input
+                            type="text"
+                            value={item.particular}
+                            onChange={(e) => handleItemChange(index, 'particular', e.target.value)}
+                            placeholder="e.g. Vehicle Rental Service"
+                            className="w-full px-3 py-1.5 border rounded-lg dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                            required
+                          />
+                        </td>
+                        <td className="py-2 px-4">
+                          <input
+                            type="number"
+                            step="any"
+                            value={item.amount}
+                            onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
+                            placeholder="e.g. 240680"
+                            className="w-full px-3 py-1.5 border rounded-lg dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                            required
+                          />
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          {items.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveItem(index)}
+                              className="text-slate-400 hover:text-rose-500 transition-colors p-1 rounded-md"
+                              title="Remove row"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddItem}
+                className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:text-indigo-400 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+              >
+                <span className="text-base font-bold">+</span> Add Row
+              </button>
+            </div>
+
             <div className="md:col-span-2 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
               <h3 className="font-medium text-slate-800 dark:text-slate-200 mb-4">Bank Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -224,7 +321,7 @@ export default function CreateInvoice({ onBack, initialData }) {
       <div style={{ position: 'fixed', left: '-9999px', top: 0, width: '750px', backgroundColor: '#fff' }}>
         <InvoiceTemplate 
           ref={pdfRef} 
-          invoice={formData} 
+          invoice={{ ...formData, items }} 
           calculatedValues={{ amount: parsedAmount, cgst, sgst, grandTotal }} 
         />
       </div>

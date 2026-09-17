@@ -161,12 +161,23 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
             <div style={{ width: '20%', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>AMOUNT</div>
           </div>
           
-          {/* Main Items Row */}
-          <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-            <div style={{ width: '8%', borderRight: '1px solid #000', padding: '15px 6px', textAlign: 'center' }}>1</div>
-            <div style={{ width: '72%', borderRight: '1px solid #000', padding: '15px 6px', textAlign: 'center' }}>Vehicle Rental Service</div>
-            <div style={{ width: '20%', padding: '15px 6px', textAlign: 'center' }}>{amount}</div>
-          </div>
+          {/* Main Items Rows */}
+          {(() => {
+            const itemsList = (invoice.items && invoice.items.length > 0)
+              ? invoice.items
+              : [{ particular: invoice.particulars || 'Vehicle Rental Service', amount: amount }];
+            return itemsList.map((item, index) => {
+              const itemAmt = parseFloat(item.amount || 0);
+              const isLast = index === itemsList.length - 1;
+              return (
+                <div key={index} style={{ display: 'flex', borderBottom: isLast ? '2px solid #000' : '1px solid #000' }}>
+                  <div style={{ width: '8%', borderRight: '1px solid #000', padding: '10px 6px', textAlign: 'center' }}>{index + 1}</div>
+                  <div style={{ width: '72%', borderRight: '1px solid #000', padding: '10px 6px', textAlign: 'center' }}>{item.particular || item.particulars || 'Vehicle Rental Service'}</div>
+                  <div style={{ width: '20%', padding: '10px 6px', textAlign: 'center' }}>{isNaN(itemAmt) ? (item.amount || '0') : itemAmt.toFixed(2)}</div>
+                </div>
+              );
+            });
+          })()}
 
           {/* Bank Details Table Row 1 */}
           <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
