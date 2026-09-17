@@ -22,8 +22,10 @@ function numberToWords(num) {
     return str.replace(/\s+/g, ' ').trim() + ".";
 }
 
-export default function CreateInvoice({ onBack }) {
-  const [formData, setFormData] = useState({
+import InvoiceTemplate from '../components/InvoiceTemplate';
+
+export default function CreateInvoice({ onBack, initialData }) {
+  const [formData, setFormData] = useState(initialData || {
     invoiceNo: `NM-${Math.floor(Math.random() * 1000)}`,
     invoiceDate: new Date().toISOString().split('T')[0],
     customerName: '',
@@ -33,7 +35,7 @@ export default function CreateInvoice({ onBack }) {
     deliveryCity: 'Bangalore',
     servicePeriodFrom: '',
     servicePeriodTo: '',
-    amount: 0,
+    amount: '',
     bankName: 'KOTAK MAHINDRA BANK',
     accountNo: '8751183874',
     ifscCode: 'KKBK0008045',
@@ -46,14 +48,14 @@ export default function CreateInvoice({ onBack }) {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'amount' ? parseFloat(value) || 0 : value
+      [name]: name === 'amount' ? (value === '' ? '' : parseFloat(value)) : value
     }));
   };
 
-  const amount = formData.amount;
-  const cgst = amount * 0.025;
-  const sgst = amount * 0.025;
-  const grandTotal = amount + cgst + sgst;
+  const parsedAmount = parseFloat(formData.amount) || 0;
+  const cgst = parsedAmount * 0.025;
+  const sgst = parsedAmount * 0.025;
+  const grandTotal = parsedAmount + cgst + sgst;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,9 +68,15 @@ export default function CreateInvoice({ onBack }) {
         cgst,
         sgst,
         grandTotal,
+        status: initialData ? initialData.status : 'Paid',
         particulars: 'Vehicle Rental Service',
       };
-      await api.post('/invoices', invoiceData);
+      
+      if (initialData && initialData._id) {
+        await api.put(`/invoices/${initialData._id}`, invoiceData);
+      } else {
+        await api.post('/invoices', invoiceData);
+      }
 
       // 2. Generate PDF
       const element = pdfRef.current;
@@ -85,11 +93,11 @@ export default function CreateInvoice({ onBack }) {
       await html2pdf().set(opt).from(element).save();
       element.style.display = 'none';
 
-      alert('Invoice created and PDF downloaded successfully!');
-      onBack();
+      alert(`Invoice ${initialData ? 'updated' : 'created'} and PDF downloaded successfully!`);
+      onBack(true);
     } catch (error) {
       console.error(error);
-      alert('Error creating invoice');
+      alert(`Error ${initialData ? 'updating' : 'creating'} invoice`);
     } finally {
       setLoading(false);
     }
@@ -102,8 +110,8 @@ export default function CreateInvoice({ onBack }) {
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         </button>
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Create Tax Invoice</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Generate a new vehicle rental invoice</p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{initialData ? 'Edit Tax Invoice' : 'Create Tax Invoice'}</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{initialData ? 'Update invoice details' : 'Generate a new vehicle rental invoice'}</p>
         </div>
       </div>
 
@@ -173,7 +181,7 @@ export default function CreateInvoice({ onBack }) {
             <h3 className="font-medium text-slate-800 dark:text-slate-200 mb-2">Tax Calculation</h3>
             <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
               <span>Amount:</span>
-              <span>₹{amount.toFixed(2)}</span>
+              <span>₹{parsedAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
               <span>CGST (2.5%):</span>
@@ -190,199 +198,18 @@ export default function CreateInvoice({ onBack }) {
           </div>
 
           <button type="submit" disabled={loading} className="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-medium transition-colors disabled:opacity-70">
-            {loading ? 'Creating & Generating PDF...' : 'Create Invoice & Download PDF'}
+            {loading ? 'Processing & Generating PDF...' : (initialData ? 'Update Invoice & Download PDF' : 'Create Invoice & Download PDF')}
           </button>
         </form>
       </div>
 
       {/* Hidden PDF Template */}
       <div style={{ display: 'none' }}>
-        <div ref={pdfRef} style={{ padding: '30px', fontFamily: '"Times New Roman", Times, serif', color: '#000', backgroundColor: '#fff' }}>
-          
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-               <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end', height: '26px' }}>
-                 <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
-                 <div style={{ width: '0', height: '0', borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderBottom: '26px solid #0055b8' }}></div>
-                 <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
-               </div>
-               <div style={{ fontSize: '11px', color: '#00a4e4', fontWeight: 'bold', margin: '4px 0', letterSpacing: '1px' }}>SURYA CABS</div>
-               <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start', height: '26px' }}>
-                 <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
-                 <div style={{ width: '0', height: '0', borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderTop: '26px solid #0055b8' }}></div>
-                 <div style={{ width: '22px', height: '26px', backgroundColor: '#0055b8' }}></div>
-               </div>
-            </div>
-            <div style={{ backgroundColor: '#0055b8', color: '#fff', padding: '10px 40px', letterSpacing: '4px', fontSize: '24px', marginTop: '20px', fontWeight: 'bold' }}>
-              SURYA CABS AND LOGISTICS
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', fontSize: '14px', marginBottom: '15px' }}>
-            # 420: 7th Block 1st C.Cross Koramangala. Bangalore 560095.<br/>
-            Contact No - 9980275630 / 9481354131 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Website: www.suryacabsandlogistics.com<br/>
-            GSTNO : 29AFYFS0562E1ZH
-          </div>
-
-          <div style={{ border: '3px solid #000', width: '100%', fontSize: '13px', display: 'flex', flexDirection: 'column' }}>
-             {/* TAX INVOICE */}
-             <div style={{ textAlign: 'center', fontWeight: 'bold', borderBottom: '2px solid #000', padding: '8px', fontSize: '15px' }}>
-                TAX INVOICE
-             </div>
-
-             {/* Top block: To ... Invoice Details */}
-             <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-                <div style={{ width: '50%', borderRight: '2px solid #000', padding: '10px' }}>
-                   To,<br/><br/>
-                   <span style={{ fontWeight: 'bold' }}>{formData.customerName}</span><br/><br/>
-                   {formData.customerAddress}
-                </div>
-                <div style={{ width: '50%' }}>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Invoice Date :</div>
-                      <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>{formData.invoiceDate}</div>
-                   </div>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Invoice No :</div>
-                      <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>{formData.invoiceNo}</div>
-                   </div>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>PAN No :</div>
-                      <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>AFYFS0562E</div>
-                   </div>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>GSTIN :</div>
-                      <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>29AFYFS0562E1ZH</div>
-                   </div>
-                   <div style={{ display: 'flex' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Nature of Services:</div>
-                      <div style={{ width: '50%', padding: '6px', fontWeight: 'bold' }}>Vehicle Rental Services</div>
-                   </div>
-                </div>
-             </div>
-
-             {/* Customer PAN / GSTIN */}
-             <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-                <div style={{ width: '50%', borderRight: '2px solid #000' }}>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Customer PAN No:</div>
-                      <div style={{ width: '50%', padding: '6px' }}>{formData.customerPan}</div>
-                   </div>
-                   <div style={{ display: 'flex' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Customer GSTIN:</div>
-                      <div style={{ width: '50%', padding: '6px' }}>{formData.customerGstin}</div>
-                   </div>
-                </div>
-                <div style={{ width: '50%' }}></div>
-             </div>
-
-             {/* Address of Delivery & Date */}
-             <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-                <div style={{ width: '50%', borderRight: '2px solid #000' }}>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000', height: '50%' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Address of Delivery (City, State):</div>
-                      <div style={{ width: '50%', padding: '6px' }}>{formData.deliveryCity.toUpperCase()}</div>
-                   </div>
-                   <div style={{ display: 'flex', height: '50%' }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Customer Name :</div>
-                      <div style={{ width: '50%', padding: '6px' }}>{formData.customerName}</div>
-                   </div>
-                </div>
-                <div style={{ width: '50%', display: 'flex' }}>
-                   <div style={{ width: '25%', borderRight: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px' }}>Date:</div>
-                   <div style={{ width: '75%', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ display: 'flex', borderBottom: '1px solid #000', flex: 1 }}>
-                         <div style={{ width: '30%', borderRight: '1px solid #000', padding: '6px' }}>From</div>
-                         <div style={{ width: '70%', padding: '6px', fontWeight: 'bold' }}>{formData.servicePeriodFrom}</div>
-                      </div>
-                      <div style={{ display: 'flex', flex: 1 }}>
-                         <div style={{ width: '30%', borderRight: '1px solid #000', padding: '6px' }}>To</div>
-                         <div style={{ width: '70%', padding: '6px', fontWeight: 'bold' }}>{formData.servicePeriodTo}</div>
-                      </div>
-                   </div>
-                </div>
-             </div>
-
-             {/* Transportation Charges */}
-             <div style={{ borderBottom: '2px solid #000', padding: '8px', textAlign: 'center', fontWeight: 'bold' }}>
-                Transportation Charges for the Month of {formData.servicePeriodFrom ? new Date(formData.servicePeriodFrom).toLocaleString('default', { month: 'long', year: 'numeric' }) : ''}
-             </div>
-
-             {/* Main Items Table Headers */}
-             <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                <div style={{ width: '8%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>Sl No</div>
-                <div style={{ width: '72%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>Particulars</div>
-                <div style={{ width: '20%', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>AMOUNT</div>
-             </div>
-             
-             {/* Main Items Row */}
-             <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-                <div style={{ width: '8%', borderRight: '1px solid #000', padding: '40px 6px', textAlign: 'center' }}>1</div>
-                <div style={{ width: '72%', borderRight: '1px solid #000', padding: '40px 6px', textAlign: 'center' }}>Vehicle Rental Service</div>
-                <div style={{ width: '20%', padding: '40px 6px', textAlign: 'center' }}>{amount}</div>
-             </div>
-
-             {/* Bank Details Table Row 1 */}
-             <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>Bank Name :</div>
-                <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>A/c No</div>
-                <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>IFSC Code</div>
-                <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>Total</div>
-                <div style={{ width: '20%', padding: '6px', textAlign: 'center', fontWeight: 'bold' }}>{amount}</div>
-             </div>
-             
-             {/* Bank Details Table Row 2 */}
-             <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{formData.bankName}</div>
-                <div style={{ width: '25%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{formData.accountNo}</div>
-                <div style={{ width: '15%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>{formData.ifscCode}</div>
-                <div style={{ width: '7.5%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>CGST</div>
-                <div style={{ width: '7.5%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center' }}>2.5%</div>
-                <div style={{ width: '20%', padding: '6px', textAlign: 'center' }}>{cgst}</div>
-             </div>
-             
-             {/* Bank Details Table Row 3 (Amount in words + SGST + Grand Total) */}
-             <div style={{ display: 'flex', borderBottom: '1px solid #000' }}>
-                <div style={{ width: '65%', borderRight: '1px solid #000', padding: '10px', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-                   Amount in words : {numberToWords(grandTotal)}
-                </div>
-                <div style={{ width: '15%', borderRight: '1px solid #000', display: 'flex', flexDirection: 'column' }}>
-                   <div style={{ display: 'flex', borderBottom: '1px solid #000', flex: 1 }}>
-                      <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>SGST</div>
-                      <div style={{ width: '50%', padding: '6px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2.5%</div>
-                   </div>
-                   <div style={{ padding: '6px', textAlign: 'center', fontWeight: 'bold', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      Grand Total
-                   </div>
-                </div>
-                <div style={{ width: '20%', display: 'flex', flexDirection: 'column' }}>
-                   <div style={{ borderBottom: '1px solid #000', padding: '6px', textAlign: 'center', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {sgst}
-                   </div>
-                   <div style={{ padding: '6px', textAlign: 'center', fontWeight: 'bold', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {grandTotal}
-                   </div>
-                </div>
-             </div>
-
-             {/* Notes */}
-             <div style={{ backgroundColor: '#ffff00', borderBottom: '2px solid #000', padding: '10px', textAlign: 'center', fontWeight: 'bold', fontSize: '13px' }}>
-                Note : As per GST notification No. 22/2019 Central Tax (Rate) as Amended to original notification No.13/2017 Central Tax (Rate). GST is payable on reverse charge basis by the recipient of service.
-             </div>
-
-             {/* Terms and conditions */}
-             <div style={{ padding: '10px', textAlign: 'left' }}>
-                <div style={{ textDecoration: 'underline', fontSize: '13px', marginBottom: '6px', fontWeight: 'bold' }}>Terms and conditions:-</div>
-                <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
-                   1. All payment by NEFT / RTGS In favour of : SURYA CABS AND LOGISTICS<br/>
-                   2. No claims and / or discrepancy if any shall be considered unless brought to the notice of the company in e-mail with in 3days of the receipt of the bill.<br/>
-                   3. Dispute if any shall be subjected to the jurisdiction of Bangalore courts only<br/>
-                   4. Company reserves the right to charge interest @ 18% P.M. on bills not as per the contract on payment terms.
-                </div>
-             </div>
-          </div>
-        </div>
+        <InvoiceTemplate 
+          ref={pdfRef} 
+          invoice={formData} 
+          calculatedValues={{ amount: parsedAmount, cgst, sgst, grandTotal }} 
+        />
       </div>
     </div>
   );
