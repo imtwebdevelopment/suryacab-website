@@ -124,24 +124,24 @@ const InvoiceTemplate = forwardRef(({ invoice, calculatedValues }, ref) => {
 
           {/* Address of Delivery & Date */}
           <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-            <div style={{ width: '50%', borderRight: '2px solid #000' }}>
-                <div style={{ display: 'flex', borderBottom: '1px solid #000', height: '50%' }}>
-                  <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Address of Delivery (City, State):</div>
-                  <div style={{ width: '50%', padding: '6px' }}>{invoice.deliveryCity?.toUpperCase()}</div>
+            <div style={{ width: '50%', borderRight: '2px solid #000', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', borderBottom: '1px solid #000', flex: 1, alignItems: 'center' }}>
+                  <div style={{ width: '50%', borderRight: '1px solid #000', padding: '4px 6px', fontSize: '11.5px', lineHeight: '1.2' }}>Address of Delivery (City, State):</div>
+                  <div style={{ width: '50%', padding: '4px 6px' }}>{invoice.deliveryCity?.toUpperCase()}</div>
                 </div>
-                <div style={{ display: 'flex', height: '50%' }}>
-                  <div style={{ width: '50%', borderRight: '1px solid #000', padding: '6px' }}>Customer Name :</div>
-                  <div style={{ width: '50%', padding: '6px' }}>{invoice.customerName}</div>
+                <div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
+                  <div style={{ width: '50%', borderRight: '1px solid #000', padding: '4px 6px' }}>Customer Name :</div>
+                  <div style={{ width: '50%', padding: '4px 6px' }}>{invoice.customerName}</div>
                 </div>
             </div>
             <div style={{ width: '50%', display: 'flex' }}>
                 <div style={{ width: '25%', borderRight: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px' }}>Date:</div>
                 <div style={{ width: '75%', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', borderBottom: '1px solid #000', flex: 1 }}>
+                  <div style={{ display: 'flex', borderBottom: '1px solid #000', flex: 1, alignItems: 'center' }}>
                       <div style={{ width: '30%', borderRight: '1px solid #000', padding: '6px' }}>From</div>
                       <div style={{ width: '70%', padding: '6px', fontWeight: 'bold' }}>{invoice.servicePeriodFrom}</div>
                   </div>
-                  <div style={{ display: 'flex', flex: 1 }}>
+                  <div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
                       <div style={{ width: '30%', borderRight: '1px solid #000', padding: '6px' }}>To</div>
                       <div style={{ width: '70%', padding: '6px', fontWeight: 'bold' }}>{invoice.servicePeriodTo}</div>
                   </div>
